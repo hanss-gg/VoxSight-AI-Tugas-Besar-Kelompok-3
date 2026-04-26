@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../utils/app_theme.dart';
-import '../../widgets/common_widgets.dart';
+import '../utils/app_theme.dart';
+import '../widgets/common_widgets.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {

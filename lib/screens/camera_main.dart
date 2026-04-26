@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import '../../utils/app_theme.dart';
+import '../utils/app_theme.dart';
 
 class CameraMain extends StatefulWidget {
   const CameraMain({super.key});

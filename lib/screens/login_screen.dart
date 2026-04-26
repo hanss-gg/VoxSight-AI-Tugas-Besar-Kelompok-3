@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../utils/app_theme.dart';
-import '../../widgets/common_widgets.dart';
-import '../flo/main_screen.dart';
+import '../utils/app_theme.dart';
+import '../widgets/common_widgets.dart';
+import 'main_screen.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 

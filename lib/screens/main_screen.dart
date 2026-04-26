@@ -3,9 +3,9 @@ import 'dashboard.dart';
 import 'notif_logic.dart';
 import 'notif.dart';
 import 'local_notif.dart';
-import '../fik/camera_main.dart';
-import '../hikmah/profile_screen.dart';
-import '../hans/location_main.dart';
+import 'camera_main.dart';
+import 'profile_screen.dart';
+import 'location_main.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
