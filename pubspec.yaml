@@ -17,6 +17,8 @@ dependencies:
   fl_chart: ^0.70.2
   flutter_local_notifications: ^17.0.0
   web_socket_channel: ^2.4.0
+  google_maps_flutter: ^2.17.0
+  geocoding: ^3.0.0
 
 dev_dependencies:
   flutter_test:

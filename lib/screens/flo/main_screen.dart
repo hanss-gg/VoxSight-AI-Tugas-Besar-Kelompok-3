@@ -3,6 +3,9 @@ import 'dashboard.dart';
 import 'notif_logic.dart';
 import 'notif.dart';
 import 'local_notif.dart';
+import '../fik/camera_main.dart';
+import '../hikmah/profile_screen.dart';
+import '../hans/location_main.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -71,10 +74,10 @@ class _MainScreenState extends State<MainScreen> {
         remaining: remaining,
         isOnline: isOnline,
       ),
-      const Center(child: Text("Lokasi")),
-      const Center(child: Text("Camera")),
+      TrackingScreen(),
+      CameraMain(),
       NotificationScreen(notifications: notifications),
-      const Center(child: Text("Profile")),
+      ProfileScreen(),
     ];
 
     return Scaffold(

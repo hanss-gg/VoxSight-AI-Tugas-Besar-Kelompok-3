@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import '../../utils/app_theme.dart';
 
 class CameraMain extends StatefulWidget {
   const CameraMain({super.key});
@@ -9,7 +10,6 @@ class CameraMain extends StatefulWidget {
 }
 
 class _CameraMainState extends State<CameraMain> {
-
   WebSocketChannel? _channel;
   bool _isConnected = false;
 
@@ -35,7 +35,6 @@ class _CameraMainState extends State<CameraMain> {
   @override
   void initState() {
     super.initState();
-    startStream();
   }
 
   @override
@@ -48,47 +47,24 @@ class _CameraMainState extends State<CameraMain> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 128,
         backgroundColor: const Color(0xFF223148),
-        title: Text(
-          "Camer Tracking",
-          style: const TextStyle(color: Colors.white),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(16.0),
+            bottomRight: Radius.circular(16.0),
+          ),
+        ),
+        title: const Text(
+          "Camera Tracking",
+          style: TextStyle(color: Colors.white),
         ),
       ),
-
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
             const SizedBox(height: 16),
-
-            Text(
-              'Tracking GPS dan Tracking Camera',
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF223148),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: const Center(
-                child: Text(
-                  'latitude: xxx Longitude: xxx',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
             Container(
               width: double.infinity,
               height: 200,
@@ -96,69 +72,257 @@ class _CameraMainState extends State<CameraMain> {
                 color: const Color(0xFF223148),
                 borderRadius: BorderRadius.circular(8.0),
               ),
-              child: _channel == null
-                  ? const Center(
-                      child: Text(
-                        'Stream berhenti',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    )
-                  : StreamBuilder<String>(
-                      stream: _channel!.stream.cast<String>(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return Center(
-                            child: Text(
-                              snapshot.data!,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: _channel == null
+                        ? const Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.videocam_off_outlined,
+                                    color: Colors.white38, size: 48),
+                                Text(
+                                  'Stream berhenti',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
                             ),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text(
-                              'Error: ${snapshot.error}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          );
+                          )
+                        : StreamBuilder<String>(
+                            stream: _channel!.stream.cast<String>(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Center(
+                                  child: Text(
+                                    snapshot.data!,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                );
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Text(
+                                    'Error: ${snapshot.error}',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                );
+                              } else {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white),
+                                );
+                              }
+                            },
+                          ),
+                  ),
+                  Positioned(
+                    right: 16,
+                    bottom: 16,
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_isConnected) {
+                          stopStream();
                         } else {
-                          return const Center(
-                            child: CircularProgressIndicator(color: Colors.white),
-                          );
+                          startStream();
                         }
                       },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: _isConnected
+                              ? AppColors.accentRed.withValues(alpha: 0.85)
+                              : AppColors.accentGreen.withValues(alpha: 0.85),
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(color: Colors.white54),
+                        ),
+                        child: Text(
+                          _isConnected ? 'Stop' : 'Start',
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
+                  ),
+                ],
+              ),
             ),
-
-            const SizedBox(height: 20),
-
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _isConnected ? null : startStream,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF223148),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: const Text('Start Stream', style: TextStyle(color: Colors.white)),
-                  ),
+            const SizedBox(height: 32),
+            Container(
+              alignment: Alignment.centerLeft,
+              margin: const EdgeInsets.only(left: 16),
+              child: Text(
+                'Sensor Details',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _isConnected ? stopStream : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.videocam, color: Colors.black, size: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Status Camera',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AppColors.textPrimary,
                     ),
-                    child: const Text('Stop Stream'),
                   ),
-                ),
-              ],
+                  const Spacer(),
+                  Text(
+                    _isConnected ? 'Online' : 'Offline',
+                    style: TextStyle(
+                      color: _isConnected ? Colors.green : Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.speed, color: Colors.black, size: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    'FPS',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    _isConnected ? '60' : 'Camera inactive',
+                    style: TextStyle(
+                      color: _isConnected ? Colors.green : Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.center_focus_strong, color: Colors.black, size: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Focus',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    _isConnected ? '85%' : 'Camera inactive',
+                    style: TextStyle(
+                      color: _isConnected ? Colors.green : Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.lens_blur, color: Colors.black, size: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Lens clarity',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    _isConnected ? '92%' : 'Camera inactive',
+                    style: TextStyle(
+                      color: _isConnected ? Colors.green : Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.network_cell, color: Colors.black, size: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Latency',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    _isConnected ? '120 ms' : 'Camera inactive',
+                    style: TextStyle(
+                      color: _isConnected ? Colors.green : Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
